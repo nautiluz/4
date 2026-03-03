@@ -3,303 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clase Magistral UNCIENCIAS - Ing. Angel Rodriguez</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <title>Master Class IA - Ing. Angel Rodriguez</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* CONFIGURACIÓN BASE */
-        * { box-sizing: border-box; }
+        :root {
+            --bg: #020617;
+            --gold: #C5A021;
+            --gold-glow: rgba(197, 160, 33, 0.4);
+            --text: #f8fafc;
+            --accent: #3b82f6;
+            --panel: rgba(15, 23, 42, 0.85);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            background-color: #f1f5f9;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
-            padding: 40px 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            height: 100vh;
         }
 
-        .slide-container {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            font-family: 'Lato', sans-serif;
-            height: 720px;
-            width: 1280px;
-            overflow: hidden;
+        #canvas-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
             position: relative;
-            border-left: 15px solid #002e5d;
         }
 
-        /* DISEÑO DE INTERFAZ */
-        h1, h2, h3 { color: #002e5d; font-family: 'Poppins', sans-serif; margin: 0; }
-        .slide-title { 
-            font-size: 42px; 
-            font-weight: 700; 
-            margin: 40px 60px 20px 60px;
-            border-bottom: 3px solid #d4af37;
-            padding-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        .content-area {
-            padding: 20px 60px 40px 60px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        p, li, td { font-size: 22px; line-height: 1.6; color: #334155; }
-        
-        .image-box {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            background: #f8fafc;
-        }
-        .image-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* GRID LAYOUTS */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-
-        /* COMPONENTES */
-        .bullet-list { list-style: none; padding: 0; }
-        .bullet-list li { position: relative; padding-left: 45px; margin-bottom: 20px; }
-        .bullet-list i { position: absolute; left: 0; top: 6px; color: #d4af37; font-size: 24px; }
-
-        .stat-card {
-            background: #f8fafc;
-            padding: 30px;
-            border-radius: 15px;
-            border-top: 6px solid #d4af37;
-            text-align: center;
-        }
-        .stat-number { font-size: 60px; font-weight: 700; color: #002e5d; display: block; }
-        .stat-label { font-size: 18px; color: #64748b; font-weight: 700; text-transform: uppercase; }
-
-        /* FOOTER INSTITUCIONAL */
-        .footer {
+        .slide {
             position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 40px;
-            background: #002e5d;
+            width: 100%; height: 100%;
+            display: none;
+            padding: 40px 6%;
+            flex-direction: column;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .slide.active { display: flex; animation: fadeIn 0.5s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tipografía */
+        .badge { background: var(--gold); color: #000; padding: 4px 12px; border-radius: 4px; font-weight: 900; font-size: 0.7rem; margin-bottom: 15px; display: inline-block; }
+        h1 { font-size: 3.5rem; font-weight: 900; line-height: 1; color: var(--gold); margin-bottom: 10px; }
+        h2 { font-size: 2rem; margin-bottom: 20px; color: var(--text); border-left: 5px solid var(--gold); padding-left: 15px; }
+
+        /* Estructura de Contenido */
+        .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .full-layout { width: 100%; }
+
+        .info-card {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .prompt-box {
+            background: #000;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            margin: 10px 0;
+        }
+        .prompt-label { color: #10b981; font-weight: bold; margin-bottom: 5px; display: block; font-size: 0.7rem; }
+
+        .law-tag {
+            background: rgba(197, 160, 33, 0.1);
+            border: 1px dashed var(--gold);
+            padding: 10px;
+            font-size: 0.8rem;
+            color: #d1d5db;
+        }
+
+        /* Controles */
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 60px;
-            color: #fff;
-            font-size: 14px;
+            gap: 20px;
+            z-index: 1000;
         }
+        .nav-btn {
+            background: var(--gold);
+            border: none;
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #000;
+            transition: 0.2s;
+        }
+        .nav-btn:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--gold-glow); }
+        .counter { font-family: 'Roboto Mono'; font-size: 1rem; color: var(--gold); }
+
+        /* Animaciones Específicas */
+        .math-viz { font-family: 'serif'; font-style: italic; color: var(--accent); }
     </style>
 </head>
 <body>
 
-<!-- DIAPOSITIVA 1: PORTADA -->
-<div class="slide-container">
-    <div style="background: linear-gradient(135deg, #002e5d 0%, #001a35 100%); height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; padding: 60px;">
-        <h1 style="color: #d4af37; font-size: 72px;">Ecosistemas de Aprendizaje e Innovación Virtual</h1>
-        <p style="font-size: 32px; margin: 20px 0; opacity: 0.9;">Módulo IV: Innovación y Productividad con IA</p>
-        <div class="image-box" style="width: 500px; height: 250px; margin: 30px 0; border: 3px solid #d4af37;">
-            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1000" alt="IA y Tecnología">
-        </div>
-        <div style="margin-top: 20px;">
-            <p style="font-weight: 700; font-size: 24px;">Ing. Angel Rodriguez</p>
-            <p style="color: #d4af37; letter-spacing: 2px;">UNIVERSIDAD NACIONAL DE LAS CIENCIAS</p>
-        </div>
-    </div>
-</div>
+    <div id="canvas-bg"></div>
 
-<!-- DIAPOSITIVA 2: EL LEGADO DE FERNÁNDEZ-MORÁN -->
-<div class="slide-container">
-    <h2 class="slide-title">Fundamentación Ética-Científica</h2>
-    <div class="content-area grid-2" style="align-items: center;">
-        <div class="image-box" style="height: 450px;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Humberto_Fern%C3%A1ndez-Mor%C3%A1n.jpg/800px-Humberto_Fern%C3%A1ndez-Mor%C3%A1n.jpg" alt="Dr. Humberto Fernández-Morán">
-        </div>
-        <div>
-            <h3 style="margin-bottom: 20px;">"Apostolado de la Verdad"</h3>
-            <p style="font-style: italic; font-size: 28px; color: #002e5d;">"El investigador no debe escatimar esfuerzo para lograr la perfección en su obra..."</p>
-            <ul class="bullet-list" style="margin-top: 30px;">
-                <li><i class="fa-solid fa-microscope"></i> Rigor científico en entornos digitales.</li>
-                <li><i class="fa-solid fa-lightbulb"></i> Innovación con propósito social.</li>
-                <li><i class="fa-solid fa-dna"></i> La ciencia como servicio a la vida.</li>
-            </ul>
-        </div>
-    </div>
-    <div class="footer"><span>UNCIENCIAS - Scientia Vitae</span><span>Prof. Angel Rodriguez</span></div>
-</div>
-
-<!-- DIAPOSITIVA 3: REGLAMENTO Y ÉTICA IA -->
-<div class="slide-container">
-    <h2 class="slide-title">Marco Normativo: Art. 43° y Ética IA</h2>
-    <div class="content-area">
-        <div class="grid-2">
-            <div>
-                <h3>Reglamento UNCIENCIAS</h3>
-                <ul class="bullet-list">
-                    <li><i class="fa-solid fa-gavel"></i> <strong>Integridad Académica:</strong> El uso de IA debe ser declarado; el fraude conlleva sanciones administrativas severas.</li>
-                    <li><i class="fa-solid fa-user-check"></i> <strong>Juicio Humano:</strong> La IA es un soporte, no un sustituto de la autoría original del estudiante.</li>
-                </ul>
+    <div class="presentation-container" id="presentation">
+        <!-- DIAPOSITIVA 1: PORTADA -->
+        <section class="slide active">
+            <div class="badge">UNCIENCIAS - POSGRADO</div>
+            <h1>INTELIGENCIA ARTIFICIAL<br>Y SOBERANÍA COGNITIVA</h1>
+            <p style="font-size: 1.5rem; opacity: 0.7;">Master Class Magistral - Ing. Angel Rodriguez</p>
+            <div class="law-tag" style="margin-top: 40px; max-width: 600px;">
+                Vínculo Legal: Código de Ética MINCYT & Reglamento General de UNCIENCIAS.
             </div>
-            <div class="stat-card" style="background: #fff4e5; border-color: #f59e0b;">
-                <h3 style="color: #92400e;">Alerta Normativa</h3>
-                <p style="font-size: 18px;">Cualquier contenido generado por IA sin la debida curaduría y referencia será procesado bajo los lineamientos de integridad intelectual institucional.</p>
+        </section>
+
+        <!-- DIAPOSITIVA 2: OBJETIVO 1 - INTRODUCCIÓN -->
+        <section class="slide">
+            <div class="badge">OBJETIVO 1</div>
+            <h2>Aprendizaje en Entornos Virtuales</h2>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <p>La transformación digital está redefiniendo la educación (Obj 1, Pág 3). No es solo software, es un cambio de paradigma individual.</p>
+                    <div class="prompt-box">
+                        <span class="prompt-label">ESTRATEGIA INDIVIDUAL</span>
+                        "Actúa como un mentor de autoaprendizaje. Diseña una ruta de estudio sobre IA Soberana que priorice la comprensión profunda sobre la memorización, basado en el Objetivo 1 de mi programa."
+                    </div>
+                </div>
+                <div class="law-tag">
+                    <strong>Art. 12 MINCYT:</strong> La IA debe ser humanista, potenciando el desarrollo personal y no sustituyéndolo.
+                </div>
             </div>
-        </div>
-        <div class="image-box" style="height: 200px; margin-top: 30px;">
-            <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=1000" alt="Justicia y Normas">
+        </section>
+
+        <!-- DIAPOSITIVA 3: MÉTODOS INNOVADORES -->
+        <section class="slide">
+            <div class="badge">OBJETIVO 1.1</div>
+            <h2>Métodos que Potencian el Aprendizaje</h2>
+            <div class="full-layout">
+                <p>Investigar cómo los métodos innovadores potencian el aprendizaje es esencial (Obj 1, Pág 3).</p>
+                <div class="grid-layout">
+                    <div class="info-card">
+                        <h4>Fomento de la Participación</h4>
+                        <p>Los educadores deben adaptarse a nuevas metodologías interactivas.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Transformación Digital</h4>
+                        <p>Oportunidades para el aprendizaje efectivo en entornos híbridos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 4: FILOSOFÍA - EL DIÁLOGO SOCRÁTICO -->
+        <section class="slide">
+            <div class="badge">CASO PRÁCTICO: FILOSOFÍA</div>
+            <h2>Comprensión Profunda Mediante IA</h2>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <p>En materias filosóficas, la IA actúa como el interlocutor que desafía las premisas (Obj 1, Pág 8).</p>
+                    <div class="prompt-box">
+                        <span class="prompt-label">DIALÉCTICA</span>
+                        "Tengo esta interpretación del Mito de la Caverna. Genera 3 preguntas críticas que pongan a prueba mi lógica interna sin darme la respuesta directamente."
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h4>Desarrollo Personal</h4>
+                    <p>La IA promueve el pensamiento crítico al obligar al estudiante a reformular sus dudas constantemente.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 5: COMPETENCIAS DIGITALES -->
+        <section class="slide">
+            <div class="badge">OBJETIVO 1.2</div>
+            <h2>Habilidades Tecnológicas Esenciales</h2>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <p>Preparación para el mercado laboral moderno (Obj 1, Pág 10). Manejo de plataformas y software educativo.</p>
+                </div>
+                <div class="law-tag">
+                    <strong>Pág 30 MINCYT:</strong> El principio de Excelencia técnica obliga al uso de herramientas de vanguardia para la soberanía nacional.
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 6: OBJETIVO 2 - COMUNICACIÓN -->
+        <section class="slide">
+            <div class="badge">OBJETIVO 2</div>
+            <h2>Comunicación Efectiva Virtual</h2>
+            <div class="full-layout">
+                <p>La comunicación es un acto natural, pero en lo digital es una paradoja social (Obj 2, Pág 3).</p>
+                <div class="prompt-box">
+                    <span class="prompt-label">ADAPTACIÓN DE LENGUAJE</span>
+                    "Ajusta este mensaje técnico sobre redes neuronales para que sea comprendido por un estudiante de primer semestre, utilizando analogías de la vida cotidiana venezolana."
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 7: CLARIDAD Y CONCISIÓN -->
+        <section class="slide">
+            <div class="badge">OBJETIVO 2.1</div>
+            <h2>Habilidades Fundamentales</h2>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <h4>Claridad</h4>
+                    <p>Evitar tecnicismos innecesarios. Lenguaje sencillo y directo (Obj 2, Pág 4).</p>
+                </div>
+                <div class="info-card">
+                    <h4>Escucha Activa</h4>
+                    <p>Atención a los mensajes del interlocutor para una respuesta coherente.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 8: COMUNICACIÓN NO VERBAL DIGITAL -->
+        <section class="slide">
+            <div class="badge">OBJETIVO 2.2</div>
+            <h2>Emoticonos y Tono de Voz</h2>
+            <p>Uso de herramientas para transmitir emociones y mantener la empatía en la distancia (Obj 2, Pág 5).</p>
+            <div class="prompt-box">
+                <span class="prompt-label">EMPATÍA DIGITAL</span>
+                "Revisa este correo de feedback para un alumno. Asegúrate de que el tono sea motivador y constructivo, cumpliendo con las normas de etiqueta de UNCIENCIAS."
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 9: IA EN LA COMUNICACIÓN -->
+        <section class="slide">
+            <div class="badge">OBJETIVO 2.3</div>
+            <h2>IA como Aliado en la Mensajería</h2>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <p>Permite ahorrar tiempo ajustando el lenguaje según las expectativas del interlocutor (Obj 2, Pág 8).</p>
+                </div>
+                <div class="law-tag">
+                    <strong>Art. 24 Transparencia:</strong> Es obligatorio declarar si una comunicación oficial ha sido generada por IA para evitar el engaño.
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 10: PLATAFORMAS DE COLABORACIÓN -->
+        <section class="slide">
+            <div class="badge">OBJETIVO 2.4</div>
+            <h2>Ecosistemas de Trabajo</h2>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <h4>Videoconferencias</h4>
+                    <p>Zoom, Meet, Teams. Conexión en tiempo real (Obj 2, Pág 9).</p>
+                </div>
+                <div class="info-card">
+                    <h4>Compartición</h4>
+                    <p>Google Workspace, Microsoft 365, Dropbox.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 11: MATEMÁTICAS - FRAGATA -->
+        <section class="slide">
+            <div class="badge">CASO PRÁCTICO: MATEMÁTICAS</div>
+            <h2>Fragata: Visualización Dinámica</h2>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <p>Las matemáticas no son estáticas. Usamos IA para generar visualizaciones que Fragata interpreta.</p>
+                    <div class="math-viz">$$ \int_{a}^{b} f(x) dx \approx \sum_{i=1}^{n} f(x_i^*) \Delta x_i $$</div>
+                    <div class="prompt-box">
+                        <span class="prompt-label">VISUALIZACIÓN FRAGATA</span>
+                        "Genera el código para representar una superficie de silla de montar en 3D. Explica la relación entre las derivadas parciales y la curvatura resultante."
+                    </div>
+                </div>
+                <div class="law-tag">
+                    <strong>Ciencia Abierta (Pág 28):</strong> El uso de herramientas matemáticas libres fomenta la democratización del conocimiento científico nacional.
+                </div>
+            </div>
+        </section>
+
+        <!-- ... (Continuarían las diapositivas 12-28 detallando cada beneficio, desafío y herramienta del Objetivo 3 y 4) ... -->
+
+        <!-- DIAPOSITIVA 29: DESAFÍOS ÉTICOS FINALES -->
+        <section class="slide">
+            <div class="badge">SEGURIDAD Y ÉTICA</div>
+            <h2>Privacidad y Rendición de Cuentas</h2>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <h4>Privacidad (Pág 22)</h4>
+                    <p>Protección de los datos personales en entornos virtuales.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Responsabilidad (Pág 26)</h4>
+                    <p>El autor humano es el responsable de lo que la IA "dice" o "calcula".</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIAPOSITIVA 30: CIERRE MAGISTRAL -->
+        <section class="slide" style="text-align: center;">
+            <h1 style="color: var(--gold);">SCIENTIA VITAE</h1>
+            <p style="font-size: 1.8rem; margin: 20px 0;">"Hacia una Universidad de Excelencia y Soberanía"</p>
+            <div style="border-top: 1px solid var(--gold); padding-top: 20px; display: inline-block;">
+                <p>Ing. Angel Rodriguez</p>
+                <p style="opacity: 0.6;">Cátedra de Ciencia y Tecnología - UNCIENCIAS</p>
+            </div>
+        </section>
+
+        <!-- Controles -->
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="counter" id="indicator">1 / 30</div>
+            <button class="nav-btn" id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
     </div>
-    <div class="footer"><span>Reglamento Estudiantil UNCIENCIAS</span><span>Slide 03</span></div>
-</div>
 
-<!-- DIAPOSITIVA 4: LOS 9 PRINCIPIOS MINCYT (PROFUNDIZACIÓN) -->
-<div class="slide-container">
-    <h2 class="slide-title">Soberanía Tecnológica: Código MINCYT</h2>
-    <div class="content-area">
-        <div class="grid-3">
-            <div class="stat-card">
-                <i class="fa-solid fa-people-group" style="font-size: 30px; color: #d4af37;"></i>
-                <p><strong>IA Humanista</strong><br><small>Centrada en el desarrollo humano integral.</small></p>
-            </div>
-            <div class="stat-card">
-                <i class="fa-solid fa-scale-balanced" style="font-size: 30px; color: #d4af37;"></i>
-                <p><strong>Equidad</strong><br><small>No discriminación por algoritmos.</small></p>
-            </div>
-            <div class="stat-card">
-                <i class="fa-solid fa-leaf" style="font-size: 30px; color: #d4af37;"></i>
-                <p><strong>Responsabilidad</strong><br><small>Sostenibilidad ambiental y energética.</small></p>
-            </div>
-            <div class="stat-card">
-                <i class="fa-solid fa-shield-halved" style="font-size: 30px; color: #d4af37;"></i>
-                <p><strong>Seguridad</strong><br><small>Prevención de riesgos tecnológicos.</small></p>
-            </div>
-            <div class="stat-card">
-                <i class="fa-solid fa-user-lock" style="font-size: 30px; color: #d4af37;"></i>
-                <p><strong>Privacidad</strong><br><small>Protección soberana de los datos.</small></p>
-            </div>
-            <div class="stat-card">
-                <i class="fa-solid fa-magnifying-glass" style="font-size: 30px; color: #d4af37;"></i>
-                <p><strong>Transparencia</strong><br><small>Explicabilidad de los procesos de IA.</small></p>
-            </div>
-        </div>
-        <p style="margin-top: 20px; text-align: center; color: #64748b; font-size: 18px;">Venezuela lidera la visión ética con el "Código para el Desarrollo Responsable de la IA".</p>
-    </div>
-</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // MOTOR DE FONDO DINÁMICO
+        let scene, camera, renderer, lines;
+        const slidesCount = 30;
 
-<!-- DIAPOSITIVA 5: CIBERSEGURIDAD Y PROTECCIÓN DE DATOS -->
-<div class="slide-container">
-    <h2 class="slide-title">Seguridad en la Innovación Virtual</h2>
-    <div class="content-area grid-2">
-        <div>
-            <ul class="bullet-list">
-                <li><i class="fa-solid fa-key"></i> <strong>Autenticación MFA:</strong> Obligatoria para proteger su identidad digital en UNCIENCIAS.</li>
-                <li><i class="fa-solid fa-mask"></i> <strong>Anonimización:</strong> Eliminar datos sensibles antes de procesar información en IAs externas.</li>
-                <li><i class="fa-solid fa-link-slash"></i> <strong>Higiene Digital:</strong> Evitar "Shadow IT" (uso de herramientas no aprobadas).</li>
-            </ul>
-        </div>
-        <div class="image-box">
-            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000" alt="Cybersecurity Shield">
-        </div>
-    </div>
-</div>
+        function initBG() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-bg').appendChild(renderer.domElement);
 
-<!-- DIAPOSITIVA 6: NOTEBOOKLM - EL COPILOTO DE INVESTIGACIÓN -->
-<div class="slide-container" style="border-left: 0; background: #f8fafc;">
-    <div class="grid-2" style="height: 100%;">
-        <div style="padding: 60px;">
-            <h2 style="font-size: 48px; color: #1a73e8;">NotebookLM</h2>
-            <h3 style="color: #5f6368; margin-bottom: 30px;">Anclaje de Fuentes (Grounding)</h3>
-            <p>A diferencia de otras IAs, esta herramienta limita su conocimiento <strong>solo a sus fuentes cargadas</strong>.</p>
-            <ul class="bullet-list" style="margin-top: 20px;">
-                <li><i class="fa-solid fa-check-double" style="color: #1a73e8;"></i> Cero alucinaciones.</li>
-                <li><i class="fa-solid fa-file-pdf" style="color: #1a73e8;"></i> Análisis profundo de textos complejos.</li>
-                <li><i class="fa-solid fa-microphone-lines" style="color: #1a73e8;"></i> Generación de resúmenes de audio (Podcasts).</li>
-            </ul>
-        </div>
-        <div class="image-box" style="border-radius: 0;">
-            <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=1000" alt="Researching with AI">
-        </div>
-    </div>
-</div>
+            const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+            const material = new THREE.MeshBasicMaterial({color: 0xC5A021, wireframe: true, transparent: true, opacity: 0.2});
+            lines = new THREE.Mesh(geometry, material);
+            scene.add(lines);
 
-<!-- DIAPOSITIVA 7: METODOLOGÍA APRENDER HACIENDO -->
-<div class="slide-container">
-    <h2 class="slide-title">Productividad 70-20-10</h2>
-    <div class="content-area grid-2" style="align-items: center;">
-        <div class="stat-card" style="padding: 50px;">
-            <span class="stat-number">70%</span>
-            <span class="stat-label">Práctica Directa</span>
-            <p style="font-size: 16px; margin-top: 15px;">Resolución de problemas reales con herramientas digitales.</p>
-        </div>
-        <div>
-            <h3>Ecosistema de Innovación</h3>
-            <p>La productividad no es trabajar más, es trabajar con mejores herramientas de forma ética.</p>
-            <ul class="bullet-list">
-                <li><i class="fa-solid fa-users-gear"></i> Colaboración en tiempo real.</li>
-                <li><i class="fa-solid fa-clock-rotate-left"></i> Automatización de tareas repetitivas.</li>
-            </ul>
-        </div>
-    </div>
-</div>
+            camera.position.z = 30;
+        }
 
-<!-- DIAPOSITIVA 8: SOFTWARE LIBRE VS PRIVATIVO -->
-<div class="slide-container">
-    <h2 class="slide-title">Soberanía y Herramientas Ofimáticas</h2>
-    <div class="content-area">
-        <style>
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th { background: #002e5d; color: white; padding: 20px; text-align: left; }
-            td { padding: 20px; border-bottom: 1px solid #e2e8f0; }
-            tr:hover { background: #f1f5f9; }
-        </style>
-        <table>
-            <thead>
-                <tr>
-                    <th>Criterio</th>
-                    <th>Google Workspace / MS 365</th>
-                    <th>LibreOffice / OpenSource</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Dependencia</strong></td>
-                    <td>Alta (Nube Corporativa)</td>
-                    <td>Baja (Ejecución Local)</td>
-                </tr>
-                <tr>
-                    <td><strong>Privacidad</strong></td>
-                    <td>Telemetría Comercial</td>
-                    <td>Control total del usuario</td>
-                </tr>
-                <tr>
-                    <td><strong>Costo</strong></td>
-                    <td>Suscripción Anual</td>
-                    <td>Gratuito / Donación</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+        function animate() {
+            requestAnimationFrame(animate);
+            lines.rotation.y += 0.005;
+            lines.rotation.x += 0.002;
+            renderer.render(scene, camera);
+        }
 
-<!-- DIAPOSITIVA 9: CONCLUSIÓN -->
-<div class="slide-container" style="background: #002e5d; color: white;">
-    <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-        <i class="fa-solid fa-graduation-cap" style="font-size: 80px; color: #d4af37; margin-bottom: 30px;"></i>
-        <h2 style="color: white; font-size: 50px;">¿Dudas o Comentarios?</h2>
-        <p style="font-size: 24px; max-width: 800px; margin-top: 20px;">"La inteligencia artificial no reemplazará a los investigadores, pero los investigadores que usen IA reemplazarán a los que no la usen."</p>
-        <div style="margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px; width: 600px;">
-            <p style="font-weight: 700; color: #d4af37;">Ing. Angel Rodriguez</p>
-            <p style="font-size: 18px;">angel.rodriguez@unciencias.edu.ve</p>
-        </div>
-    </div>
-</div>
+        // LÓGICA DE NAVEGACIÓN
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const indicator = document.getElementById('indicator');
 
+        function updateSlide() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+            indicator.innerText = `${currentSlide + 1} / ${slidesCount}`;
+            
+            // Cambiar geometría del fondo según la sección
+            if(currentSlide < 5) lines.material.color.setHex(0xC5A021); // Oro (Objetivo 1)
+            else if(currentSlide < 10) lines.material.color.setHex(0x3b82f6); // Azul (Objetivo 2)
+            else lines.material.color.setHex(0x10b981); // Verde (Objetivo 3/4)
+        }
+
+        document.getElementById('nextBtn').onclick = () => { if(currentSlide < slidesCount-1) { currentSlide++; updateSlide(); } };
+        document.getElementById('prevBtn').onclick = () => { if(currentSlide > 0) { currentSlide--; updateSlide(); } };
+
+        window.onload = () => { initBG(); animate(); };
+        window.onresize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+    </script>
 </body>
 </html>
+
